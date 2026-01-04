@@ -3,169 +3,133 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ServerInfo - 服务器信息</title>
+    <title>载入中...</title>
     <style>
-        :root {
-            --bg-color: #0a0a0a;
-            --card-bg: rgba(255, 255, 255, 0.03);
-            --inner-bg: rgba(0, 0, 0, 0.4);
-            --border-color: rgba(255, 255, 255, 0.1);
-            --text-main: #f3f4f6;
-            --text-dim: #9ca3af;
-            --java-color: #f97316;
-            --be-color: #3b82f6;
+        :root { --bg: #0a0a0a; --card: #161616; --primary: #3b82f6; --text: #eee; }
+        body { background: var(--bg); color: var(--text); font-family: sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        
+        /* 容器初始隐藏，通过 JS 激活 */
+        #app { 
+            width: 90%; max-width: 500px; background: var(--card); padding: 30px; 
+            border-radius: 30px; border: 1px solid #333; text-align: center; 
+            display: none; opacity: 0; transition: opacity 0.5s ease; 
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { 
-            background-color: var(--bg-color); 
-            color: var(--text-main); 
-            font-family: system-ui, -apple-system, sans-serif;
-            display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px;
+        h1 { font-size: 2rem; margin-bottom: 10px; font-weight: 800; }
+        .desc { color: #888; font-size: 0.95rem; line-height: 1.5; margin-bottom: 20px; }
+        
+        .card { background: #222; border-radius: 20px; padding: 20px; text-align: left; border: 1px solid #444; margin-top: 20px; position: relative; overflow: hidden; }
+        .badge { color: var(--primary); font-size: 11px; font-weight: bold; border: 1px solid var(--primary); padding: 2px 8px; border-radius: 10px; text-transform: uppercase; }
+        .addr { font-family: monospace; font-size: 1.4rem; margin: 15px 0; word-break: break-all; color: #fff; }
+        
+        button { 
+            width: 100%; padding: 12px; background: var(--primary); color: white; 
+            border: none; border-radius: 12px; font-weight: bold; cursor: pointer; transition: 0.2s; 
         }
+        button:active { transform: scale(0.98); opacity: 0.9; }
 
-        /* 初始状态：app 容器先隐藏，防止闪烁 */
-        #app {
-            width: 100%; max-width: 800px;
-            background: var(--card-bg);
-            backdrop-filter: blur(16px);
-            border: 1px solid var(--border-color);
-            border-radius: 40px;
-            padding: 40px;
-            text-align: center;
-            display: none; /* 初始隐藏 */
-        }
-
-        .title { font-size: 2.5rem; font-weight: 900; margin-bottom: 10px; background: linear-gradient(to bottom right, #fff, #666); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .desc { color: var(--text-dim); margin-bottom: 30px; line-height: 1.6; }
-
-        .card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        @media (max-width: 600px) { .card-grid { grid-template-columns: 1fr; } }
-
-        .inner-card {
-            background: var(--inner-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 24px;
-            padding: 24px;
-            text-align: left;
-            display: none; /* 默认卡片也不显示 */
-        }
-
-        .badge { font-size: 10px; font-weight: bold; padding: 4px 10px; border-radius: 20px; border: 1px solid currentColor; margin-bottom: 15px; display: inline-block; }
-        .label { font-size: 10px; text-transform: uppercase; color: var(--text-dim); letter-spacing: 1px; margin-bottom: 8px; }
-        .address { font-family: monospace; font-size: 1.2rem; margin-bottom: 20px; word-break: break-all; }
-
-        .copy-btn {
-            width: 100%; padding: 12px; border: none; border-radius: 12px; cursor: pointer;
-            font-weight: bold; transition: transform 0.1s;
-        }
-        .copy-btn:active { transform: scale(0.95); }
-        .btn-java { background: #fff; color: #000; }
-        .btn-be { background: var(--be-color); color: #fff; }
-
-        .features { margin-top: 30px; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
-        .feat-tag { padding: 6px 15px; border-radius: 20px; border: 1px solid var(--border-color); color: var(--text-dim); font-size: 12px; }
+        .tags { display: flex; gap: 8px; justify-content: center; margin-top: 20px; flex-wrap: wrap; }
+        .tag { font-size: 12px; background: #333; padding: 5px 12px; border-radius: 20px; color: #aaa; border: 1px solid #444; }
     </style>
 </head>
 <body>
 
-    <div id="app">
-        <h1 id="serverName" class="title">加载中...</h1>
-        <p id="description" class="desc"></p>
+<div id="app">
+    <h1 id="name"></h1>
+    <p id="desc" class="desc"></p>
+    
+    <div id="cards"></div>
+    
+    <div id="tags" class="tags"></div>
+</div>
 
-        <div id="card-container" class="card-grid">
-            <div id="java-card" class="inner-card">
-                <div class="badge" style="color: var(--java-color)">JAVA EDITION</div>
-                <div class="label">Address</div>
-                <div id="j-addr" class="address">---</div>
-                <button onclick="copyText('j-addr')" class="copy-btn btn-java">复制地址</button>
-            </div>
+<script>
+    async function start() {
+        const app = document.getElementById('app');
+        const placeholder = "__SERVER_CONFIG_JSON__";
+        let cfg = null;
 
-            <div id="bedrock-card" class="inner-card">
-                <div class="badge" style="color: var(--be-color)">BEDROCK</div>
-                <div class="label">IP & Port</div>
-                <div id="b-addr" class="address">---</div>
-                <button onclick="copyText('b-addr')" class="copy-btn btn-be">复制地址</button>
-            </div>
-        </div>
-
-        <div id="features" class="features"></div>
-    </div>
-
-    <script>
-        async function init() {
-            const app = document.getElementById('app');
-            const placeholder = "__SERVER_CONFIG_JSON__";
-            let cfg = null;
-
-            try {
-                // 1. 获取配置
-                if (placeholder !== "__SERVER_CONFIG_JSON__" && placeholder.trim() !== "") {
-                    cfg = typeof placeholder === 'string' ? JSON.parse(placeholder) : placeholder;
-                } else {
-                    const res = await fetch('config.json');
-                    cfg = await res.json();
-                }
-
-                if (!cfg) throw new Error("No config found");
-
-                // 2. 填充内容
-                document.getElementById('serverName').innerText = cfg.serverName || "Server";
-                document.getElementById('description').innerText = cfg.description || "";
-
-                // 3. 显式控制卡片显示 (关键修复)
-                let showJava = false;
-                let showBE = false;
-
-                if (cfg.java && cfg.java.ip) {
-                    const portStr = (cfg.java.port == "25565" || !cfg.java.port) ? "" : ":" + cfg.java.port;
-                    document.getElementById('j-addr').innerText = cfg.java.ip + portStr;
-                    document.getElementById('java-card').style.display = 'block';
-                    showJava = true;
-                }
-
-                if (cfg.bedrock && cfg.bedrock.ip) {
-                    document.getElementById('b-addr').innerText = `${cfg.bedrock.ip}:${cfg.bedrock.port || '19132'}`;
-                    document.getElementById('bedrock-card').style.display = 'block';
-                    showBE = true;
-                }
-
-                // 4. 居中逻辑
-                if (!showJava || !showBE) {
-                    const container = document.getElementById('card-container');
-                    container.style.gridTemplateColumns = "1fr";
-                    container.style.maxWidth = "400px";
-                    container.style.margin = "0 auto";
-                }
-
-                // 5. 标签
-                if (cfg.features) {
-                    const featDiv = document.getElementById('features');
-                    cfg.features.forEach(f => {
-                        const s = document.createElement('span');
-                        s.className = 'feat-tag';
-                        s.innerText = f;
-                        featDiv.appendChild(s);
-                    });
-                }
-
-                // 6. 全部准备好后，显示整个容器
-                app.style.display = 'block';
-
-            } catch (err) {
-                console.error("Initialization failed:", err);
-                app.style.display = 'block';
-                document.getElementById('serverName').innerText = "加载失败";
-                document.getElementById('description').innerText = "请检查配置文件或环境变量。";
+        try {
+            // --- 步骤 1: 获取配置 ---
+            if (placeholder !== "__SERVER_CONFIG_JSON__" && placeholder.trim() !== "") {
+                cfg = typeof placeholder === 'string' ? JSON.parse(placeholder) : placeholder;
+            } else {
+                const res = await fetch('config.json');
+                if (!res.ok) throw new Error("Config not found");
+                cfg = await res.json();
             }
-        }
 
-        function copyText(id) {
-            const text = document.getElementById(id).innerText;
-            navigator.clipboard.writeText(text).then(() => alert("已复制！"));
-        }
+            // --- 步骤 2: 动态更新所有标题 ---
+            const sName = cfg.serverName || "我的服务器";
+            document.title = sName; // 更新浏览器标签页标题
+            document.getElementById('name').innerText = sName; // 更新页面大标题
+            document.getElementById('desc').innerText = cfg.description || "";
 
-        init();
-    </script>
+            // --- 步骤 3: 渲染卡片 ---
+            const cardsContainer = document.getElementById('cards');
+            
+            // Java 版判断 (如果 java 为 null 或 ip 为空则不渲染)
+            if (cfg.java && cfg.java.ip) {
+                const port = (cfg.java.port == "25565" || !cfg.java.port) ? "" : ":" + cfg.java.port;
+                addCard(cardsContainer, "Java Edition", cfg.java.ip + port, "#f97316");
+            }
+
+            // Bedrock 版判断
+            if (cfg.bedrock && cfg.bedrock.ip) {
+                const port = ":" + (cfg.bedrock.port || "19132");
+                addCard(cardsContainer, "Bedrock Edition", cfg.bedrock.ip + port, "#3b82f6");
+            }
+
+            // --- 步骤 4: 渲染特色标签 ---
+            if (cfg.features && Array.isArray(cfg.features)) {
+                const tagsContainer = document.getElementById('tags');
+                cfg.features.forEach(f => {
+                    const span = document.createElement('span');
+                    span.className = 'tag';
+                    span.innerText = f;
+                    tagsContainer.appendChild(span);
+                });
+            }
+
+        } catch (err) {
+            console.error("Initialization error:", err);
+            document.getElementById('name').innerText = "载入失败";
+            document.getElementById('desc').innerText = "请检查配置文件格式或网络连接";
+        } finally {
+            // --- 步骤 5: 最终显示容器 ---
+            app.style.display = 'block';
+            // 使用 requestAnimationFrame 确保 display:block 渲染后再执行动画
+            requestAnimationFrame(() => {
+                app.style.opacity = '1';
+            });
+        }
+    }
+
+    // 辅助函数：生成卡片
+    function addCard(container, type, addr, color) {
+        const cardId = 'addr_' + Math.random().toString(36).substr(2, 9);
+        const cardHtml = `
+            <div class="card" style="border-top: 3px solid ${color}">
+                <span class="badge" style="color:${color}; border-color:${color}55">${type}</span>
+                <div class="addr" id="${cardId}">${addr}</div>
+                <button onclick="copy('${cardId}')" style="background:${color}">复制地址</button>
+            </div>
+        `;
+        container.insertAdjacentHTML('beforeend', cardHtml);
+    }
+
+    // 复制功能
+    function copy(id) {
+        const text = document.getElementById(id).innerText;
+        navigator.clipboard.writeText(text).then(() => {
+            alert("地址已成功复制！");
+        }).catch(err => {
+            console.error('Copy failed', err);
+        });
+    }
+
+    // 启动
+    window.onload = start;
+</script>
 </body>
 </html>
