@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ServerInfo - 服务器信息</title>
     <style>
-        /* 1. 核心样式定义 */
         :root {
             --bg-color: #0a0a0a;
             --card-bg: rgba(255, 255, 255, 0.03);
@@ -21,11 +20,11 @@
         body { 
             background-color: var(--bg-color); 
             color: var(--text-main); 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            display: flex; align-items: center; justify-content: center; min-height: screen; height: 100vh; padding: 20px;
+            font-family: system-ui, -apple-system, sans-serif;
+            display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px;
         }
 
-        /* 2. 容器与卡片 */
+        /* 初始状态：app 容器先隐藏，防止闪烁 */
         #app {
             width: 100%; max-width: 800px;
             background: var(--card-bg);
@@ -34,8 +33,7 @@
             border-radius: 40px;
             padding: 40px;
             text-align: center;
-            transition: all 0.8s ease-out;
-            opacity: 1; /* 默认可见，防止逻辑报错导致不显示 */
+            display: none; /* 初始隐藏 */
         }
 
         .title { font-size: 2.5rem; font-weight: 900; margin-bottom: 10px; background: linear-gradient(to bottom right, #fff, #666); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
@@ -50,10 +48,9 @@
             border-radius: 24px;
             padding: 24px;
             text-align: left;
-            position: relative;
+            display: none; /* 默认卡片也不显示 */
         }
 
-        /* 3. 元素组件 */
         .badge { font-size: 10px; font-weight: bold; padding: 4px 10px; border-radius: 20px; border: 1px solid currentColor; margin-bottom: 15px; display: inline-block; }
         .label { font-size: 10px; text-transform: uppercase; color: var(--text-dim); letter-spacing: 1px; margin-bottom: 8px; }
         .address { font-family: monospace; font-size: 1.2rem; margin-bottom: 20px; word-break: break-all; }
@@ -68,14 +65,12 @@
 
         .features { margin-top: 30px; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
         .feat-tag { padding: 6px 15px; border-radius: 20px; border: 1px solid var(--border-color); color: var(--text-dim); font-size: 12px; }
-
-        .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
     <div id="app">
-        <h1 id="serverName" class="title">正在加载...</h1>
+        <h1 id="serverName" class="title">加载中...</h1>
         <p id="description" class="desc"></p>
 
         <div id="card-container" class="card-grid">
@@ -98,12 +93,13 @@
     </div>
 
     <script>
-        async function loadData() {
-            let cfg = null;
+        async function init() {
+            const app = document.getElementById('app');
             const placeholder = "__SERVER_CONFIG_JSON__";
+            let cfg = null;
 
             try {
-                // 1. 获取数据逻辑
+                // 1. 获取配置
                 if (placeholder !== "__SERVER_CONFIG_JSON__" && placeholder.trim() !== "") {
                     cfg = typeof placeholder === 'string' ? JSON.parse(placeholder) : placeholder;
                 } else {
@@ -111,37 +107,40 @@
                     cfg = await res.json();
                 }
 
-                // 2. 填充基础信息
-                document.getElementById('serverName').innerText = cfg.serverName || "我的服务器";
+                if (!cfg) throw new Error("No config found");
+
+                // 2. 填充内容
+                document.getElementById('serverName').innerText = cfg.serverName || "Server";
                 document.getElementById('description').innerText = cfg.description || "";
 
-                // 3. 处理卡片显示
-                const jCard = document.getElementById('java-card');
-                const bCard = document.getElementById('bedrock-card');
+                // 3. 显式控制卡片显示 (关键修复)
+                let showJava = false;
+                let showBE = false;
 
-                if (cfg.java) {
+                if (cfg.java && cfg.java.ip) {
                     const portStr = (cfg.java.port == "25565" || !cfg.java.port) ? "" : ":" + cfg.java.port;
                     document.getElementById('j-addr').innerText = cfg.java.ip + portStr;
-                } else {
-                    jCard.classList.add('hidden');
+                    document.getElementById('java-card').style.display = 'block';
+                    showJava = true;
                 }
 
-                if (cfg.bedrock) {
+                if (cfg.bedrock && cfg.bedrock.ip) {
                     document.getElementById('b-addr').innerText = `${cfg.bedrock.ip}:${cfg.bedrock.port || '19132'}`;
-                } else {
-                    bCard.classList.add('hidden');
+                    document.getElementById('bedrock-card').style.display = 'block';
+                    showBE = true;
                 }
 
-                // 4. 只有一张卡片时居中处理
-                if (!cfg.java || !cfg.bedrock) {
-                    document.getElementById('card-container').style.gridTemplateColumns = "1fr";
-                    document.getElementById('card-container').style.maxWidth = "400px";
-                    document.getElementById('card-container').style.margin = "0 auto";
+                // 4. 居中逻辑
+                if (!showJava || !showBE) {
+                    const container = document.getElementById('card-container');
+                    container.style.gridTemplateColumns = "1fr";
+                    container.style.maxWidth = "400px";
+                    container.style.margin = "0 auto";
                 }
 
-                // 5. 特色标签
-                const featDiv = document.getElementById('features');
+                // 5. 标签
                 if (cfg.features) {
+                    const featDiv = document.getElementById('features');
                     cfg.features.forEach(f => {
                         const s = document.createElement('span');
                         s.className = 'feat-tag';
@@ -150,10 +149,14 @@
                     });
                 }
 
-            } catch (e) {
-                console.error(e);
-                document.getElementById('serverName').innerText = "配置加载失败";
-                document.getElementById('description').innerText = "请检查 config.json 格式或 Cloudflare 环境变量设置。";
+                // 6. 全部准备好后，显示整个容器
+                app.style.display = 'block';
+
+            } catch (err) {
+                console.error("Initialization failed:", err);
+                app.style.display = 'block';
+                document.getElementById('serverName').innerText = "加载失败";
+                document.getElementById('description').innerText = "请检查配置文件或环境变量。";
             }
         }
 
@@ -162,7 +165,7 @@
             navigator.clipboard.writeText(text).then(() => alert("已复制！"));
         }
 
-        loadData();
+        init();
     </script>
 </body>
 </html>
