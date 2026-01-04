@@ -5,131 +5,142 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>载入中...</title>
     <style>
-        :root { --bg: #0a0a0a; --card: #161616; --primary: #3b82f6; --text: #eee; }
-        body { background: var(--bg); color: var(--text); font-family: sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        :root { --bg: #050505; --card: #121212; --primary: #3b82f6; --java: #f97316; --text: #f0f0f0; }
+        body { background: var(--bg); color: var(--text); font-family: -apple-system, system-ui, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
         
-        /* 容器初始隐藏，通过 JS 激活 */
-        #app { 
-            width: 90%; max-width: 500px; background: var(--card); padding: 30px; 
-            border-radius: 30px; border: 1px solid #333; text-align: center; 
-            display: none; opacity: 0; transition: opacity 0.5s ease; 
-        }
+        /* 隐形管理入口 */
+        #admin-trigger { position: fixed; top: 0; left: 0; width: 60px; height: 60px; z-index: 999; cursor: pointer; }
+        .bars { opacity: 0; transition: 0.3s; padding: 20px; }
+        .bars div { width: 20px; height: 2px; background: #fff; margin: 4px 0; border-radius: 2px; }
+        .visible-trigger .bars { opacity: 0.2; } 
 
-        h1 { font-size: 2rem; margin-bottom: 10px; font-weight: 800; }
-        .desc { color: #888; font-size: 0.95rem; line-height: 1.5; margin-bottom: 20px; }
+        #app { width: 92%; max-width: 440px; background: var(--card); padding: 40px 25px; border-radius: 40px; border: 1px solid #222; text-align: center; display: none; opacity: 0; transition: 0.6s ease; }
+        h1 { font-size: 1.8rem; margin-bottom: 10px; font-weight: 800; }
+        .desc { color: #666; font-size: 0.9rem; margin-bottom: 30px; }
         
-        .card { background: #222; border-radius: 20px; padding: 20px; text-align: left; border: 1px solid #444; margin-top: 20px; position: relative; overflow: hidden; }
-        .badge { color: var(--primary); font-size: 11px; font-weight: bold; border: 1px solid var(--primary); padding: 2px 8px; border-radius: 10px; text-transform: uppercase; }
-        .addr { font-family: monospace; font-size: 1.4rem; margin: 15px 0; word-break: break-all; color: #fff; }
+        .card { background: #1a1a1a; border-radius: 28px; padding: 22px; text-align: left; border: 1px solid #282828; margin-bottom: 20px; }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+        .badge { font-size: 10px; font-weight: 900; border: 1.5px solid currentColor; padding: 2px 10px; border-radius: 10px; text-transform: uppercase; }
+        .version-tag { font-size: 11px; color: #444; font-family: monospace; }
         
-        button { 
-            width: 100%; padding: 12px; background: var(--primary); color: white; 
-            border: none; border-radius: 12px; font-weight: bold; cursor: pointer; transition: 0.2s; 
-        }
-        button:active { transform: scale(0.98); opacity: 0.9; }
+        .data-box { background: #0c0c0c; padding: 14px 16px; border-radius: 16px; margin-bottom: 10px; border: 1px solid #222; }
+        .label { font-size: 9px; color: #444; text-transform: uppercase; margin-bottom: 5px; }
+        .val { font-family: monospace; font-size: 1.15rem; color: #fff; word-break: break-all; }
+        
+        .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px; }
+        button { border: none; border-radius: 14px; padding: 14px; font-weight: 800; cursor: pointer; transition: 0.2s; font-size: 13px; }
+        button:active { transform: scale(0.96); }
+        .btn-p { background: var(--primary); color: #fff; }
+        .btn-j { background: var(--java); color: #fff; }
+        .btn-dark { background: #2a2a2a; color: #aaa; }
 
-        .tags { display: flex; gap: 8px; justify-content: center; margin-top: 20px; flex-wrap: wrap; }
-        .tag { font-size: 12px; background: #333; padding: 5px 12px; border-radius: 20px; color: #aaa; border: 1px solid #444; }
+        .tag { font-size: 11px; background: #0a0a0a; padding: 5px 14px; border-radius: 20px; color: #444; border: 1px solid #1a1a1a; margin: 0 4px; }
     </style>
 </head>
 <body>
 
-<div id="app">
-    <h1 id="name"></h1>
-    <p id="desc" class="desc"></p>
-    
-    <div id="cards"></div>
-    
-    <div id="tags" class="tags"></div>
-</div>
+    <div id="admin-trigger" onclick="location.href='admin.html'">
+        <div class="bars"><div></div><div></div><div></div></div>
+    </div>
+
+    <div id="app">
+        <h1 id="s-name"></h1>
+        <p id="s-desc" class="desc"></p>
+        <div id="cards-container"></div>
+        <div id="s-features" style="display:flex; justify-content:center; flex-wrap:wrap; gap:8px; margin-top:25px;"></div>
+    </div>
 
 <script>
-    async function start() {
-        const app = document.getElementById('app');
-        const placeholder = "__SERVER_CONFIG_JSON__";
-        let cfg = null;
-
+    async function init() {
         try {
-            // --- 步骤 1: 获取配置 ---
-            if (placeholder !== "__SERVER_CONFIG_JSON__" && placeholder.trim() !== "") {
-                cfg = typeof placeholder === 'string' ? JSON.parse(placeholder) : placeholder;
-            } else {
-                const res = await fetch('config.json');
-                if (!res.ok) throw new Error("Config not found");
-                cfg = await res.json();
+            // 关键修改：直接请求后端 API 接口，不再读取本地文件或变量
+            // 后端逻辑会从 Cloudflare KV 数据库提取实时数据
+            const res = await fetch('/api/config'); 
+            if (!res.ok) throw new Error("无法从后端获取配置");
+            const cfg = await res.json();
+
+            // 1. 设置标题和描述
+            document.title = cfg.serverName || "服务器状态";
+            document.getElementById('s-name').innerText = cfg.serverName || "我的服务器";
+            document.getElementById('s-desc').innerText = cfg.description || "";
+
+            // 2. 管理入口可见性
+            if (!cfg.hideAdminVisual) {
+                document.getElementById('admin-trigger').classList.add('visible-trigger');
             }
 
-            // --- 步骤 2: 动态更新所有标题 ---
-            const sName = cfg.serverName || "我的服务器";
-            document.title = sName; // 更新浏览器标签页标题
-            document.getElementById('name').innerText = sName; // 更新页面大标题
-            document.getElementById('desc').innerText = cfg.description || "";
+            const container = document.getElementById('cards-container');
 
-            // --- 步骤 3: 渲染卡片 ---
-            const cardsContainer = document.getElementById('cards');
-            
-            // Java 版判断 (如果 java 为 null 或 ip 为空则不渲染)
+            // 3. 渲染 Java 版
             if (cfg.java && cfg.java.ip) {
                 const port = (cfg.java.port == "25565" || !cfg.java.port) ? "" : ":" + cfg.java.port;
-                addCard(cardsContainer, "Java Edition", cfg.java.ip + port, "#f97316");
+                container.innerHTML += `
+                    <div class="card" style="border-top: 4px solid var(--java)">
+                        <div class="card-header">
+                            <span class="badge" style="color:var(--java)">Java Edition</span>
+                            <span class="version-tag">${cfg.java.version || ''}</span>
+                        </div>
+                        <div class="data-box">
+                            <div class="label">Server Address</div>
+                            <div class="val" id="j_full">${cfg.java.ip}${port}</div>
+                        </div>
+                        <button class="btn-j" style="width:100%" onclick="copy('j_full')">复制地址</button>
+                    </div>`;
             }
 
-            // Bedrock 版判断
+            // 4. 渲染基岩版 (分段复制)
             if (cfg.bedrock && cfg.bedrock.ip) {
-                const port = ":" + (cfg.bedrock.port || "19132");
-                addCard(cardsContainer, "Bedrock Edition", cfg.bedrock.ip + port, "#3b82f6");
+                container.innerHTML += `
+                    <div class="card" style="border-top: 4px solid var(--primary)">
+                        <div class="card-header">
+                            <span class="badge" style="color:var(--primary)">Bedrock Edition</span>
+                            <span class="version-tag">${cfg.bedrock.version || ''}</span>
+                        </div>
+                        <div class="data-box">
+                            <div class="label">Server IP</div>
+                            <div class="val" id="b_ip">${cfg.bedrock.ip}</div>
+                        </div>
+                        <div class="data-box">
+                            <div class="label">Port</div>
+                            <div class="val" id="b_port">${cfg.bedrock.port || '19132'}</div>
+                        </div>
+                        <div class="btn-grid">
+                            <button class="btn-dark" onclick="copy('b_ip')">复制 IP</button>
+                            <button class="btn-p" onclick="copy('b_port')">复制端口</button>
+                        </div>
+                    </div>`;
             }
 
-            // --- 步骤 4: 渲染特色标签 ---
-            if (cfg.features && Array.isArray(cfg.features)) {
-                const tagsContainer = document.getElementById('tags');
+            // 5. 特色标签
+            if (cfg.features) {
                 cfg.features.forEach(f => {
-                    const span = document.createElement('span');
-                    span.className = 'tag';
-                    span.innerText = f;
-                    tagsContainer.appendChild(span);
+                    document.getElementById('s-features').innerHTML += `<span class="tag">${f}</span>`;
                 });
             }
 
-        } catch (err) {
-            console.error("Initialization error:", err);
-            document.getElementById('name').innerText = "载入失败";
-            document.getElementById('desc').innerText = "请检查配置文件格式或网络连接";
-        } finally {
-            // --- 步骤 5: 最终显示容器 ---
+            // 显示
+            const app = document.getElementById('app');
             app.style.display = 'block';
-            // 使用 requestAnimationFrame 确保 display:block 渲染后再执行动画
-            requestAnimationFrame(() => {
-                app.style.opacity = '1';
-            });
+            setTimeout(() => app.style.opacity = '1', 50);
+
+        } catch (e) {
+            console.error(e);
+            document.getElementById('s-name').innerText = "数据载入失败";
+            document.getElementById('s-desc').innerText = "请确认后端 API 是否配置正确 (Cloudflare KV 绑定)。";
         }
     }
 
-    // 辅助函数：生成卡片
-    function addCard(container, type, addr, color) {
-        const cardId = 'addr_' + Math.random().toString(36).substr(2, 9);
-        const cardHtml = `
-            <div class="card" style="border-top: 3px solid ${color}">
-                <span class="badge" style="color:${color}; border-color:${color}55">${type}</span>
-                <div class="addr" id="${cardId}">${addr}</div>
-                <button onclick="copy('${cardId}')" style="background:${color}">复制地址</button>
-            </div>
-        `;
-        container.insertAdjacentHTML('beforeend', cardHtml);
-    }
-
-    // 复制功能
     function copy(id) {
         const text = document.getElementById(id).innerText;
         navigator.clipboard.writeText(text).then(() => {
-            alert("地址已成功复制！");
-        }).catch(err => {
-            console.error('Copy failed', err);
+            const btn = event.target;
+            const originalText = btn.innerText;
+            btn.innerText = "已复制 ✅";
+            setTimeout(() => btn.innerText = originalText, 1000);
         });
     }
 
-    // 启动
-    window.onload = start;
+    init();
 </script>
 </body>
 </html>
