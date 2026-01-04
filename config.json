@@ -1,8 +1,11 @@
 {
   "serverName": "我的世界冒险之旅",
-  "ip": "play.example.com",
-  "port": "25565",
-  "version": "1.20.1 - 1.21",
-  "description": "这是一个纯净生存服务器，欢迎来到我们的社区！",
-  "features": ["专业插件维护", "24小时稳定运行", "和谐社区氛围"]
+  "description": "欢迎来到我们的服务器！请选择对应的版本进入游戏。",
+  "java": nell,
+  "bedrock": {
+    "ip": "play.simpfun.cn",
+    "port": "22074",
+    "version": "1.21.10x"
+  },
+  "features": ["安全反作弊", "长期开放", "安全认证"]
 }
