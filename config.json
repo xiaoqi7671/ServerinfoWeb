@@ -1,8 +1,20 @@
 {
-  "serverName": "我的世界冒险之旅",
-  "ip": "play.example.com",
-  "port": "25565",
-  "version": "1.20.1 - 1.21",
-  "description": "这是一个纯净生存服务器，欢迎来到我们的社区！",
-  "features": ["专业插件维护", "24小时稳定运行", "和谐社区氛围"]
+  "serverName": "我的世界猫猫服",
+  "description": "这是一个充满爱与创造力的生存服务器，欢迎每一位建筑大师加入！",
+  "java": {
+    "ip": "play.catmc.com",
+    "port": "25565",
+    "version": "1.20.1 - 1.20.4"
+  },
+  "bedrock": {
+    "ip": "be.catmc.com",
+    "port": "19132",
+    "version": "最新基岩版"
+  },
+  "features": [
+    "原版生存",
+    "正版验证",
+    "超大地图",
+    "和谐社区"
+  ]
 }
