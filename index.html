@@ -33,7 +33,7 @@
             transition: all 0.3s ease;
         }
 
-        。container {
+        .container {
             max-width: 850px;
             margin: 40px auto;
             padding: 0 20px;
@@ -41,7 +41,7 @@
 
         h1 { text-align: center; font-weight: 800; letter-spacing: -1px; }
 
-        。section-title {
+        .section-title {
             margin: 40px 0 20px;
             font-weight: bold;
             opacity: 0.8;
@@ -49,7 +49,7 @@
             align-items: center;
         }
 
-        。section-title::after {
+        .section-title::after {
             content: "";
             flex: 1;
             height: 1px;
@@ -58,13 +58,13 @@
         }
 
         /* 自动适应卡片数量 */
-        。card-grid {
+        .card-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 20px;
         }
 
-        。card {
+        .card {
             background: var(--card-bg);
             padding: 24px;
             border-radius: 20px;
@@ -74,30 +74,30 @@
             border: 1px solid transparent;
         }
 
-        。card:hover {
+        .card:hover {
             transform: translateY(-6px);
             box-shadow: 0 10px 25px var(--shadow);
             border-color: var(--accent);
         }
 
-        。card h3 { margin: 0 0 10px 0; color: var(--accent); font-size: 1.2rem; }
-        。card p { margin: 5px 0; font-family: 'Courier New', Courier, monospace; font-weight: bold; }
-        。card small { color: var(--secondary-text); font-size: 0.85rem; }
+        .card h3 { margin: 0 0 10px 0; color: var(--accent); font-size: 1.2rem; }
+        .card p { margin: 5px 0; font-family: 'Courier New', Courier, monospace; font-weight: bold; }
+        .card small { color: var(--secondary-text); font-size: 0.85rem; }
 
         /* 特点板块样式 */
-        。feature-blue { border-left: 5px solid #0984e3; }
-        。feature-green { border-left: 5px solid #00b894; }
-        。feature-orange { border-left: 5px solid #e17055; }
-        。feature-purple { border-left: 5px solid #6c5ce7; }
+        .feature-blue { border-left: 5px solid #0984e3; }
+        .feature-green { border-left: 5px solid #00b894; }
+        .feature-orange { border-left: 5px solid #e17055; }
+        .feature-purple { border-left: 5px solid #6c5ce7; }
         /* 自定义扩展颜色 */
-        。feature-gold { border-left: 5px solid #ffca28; }  /* 黄金色：适合赞助、等级 */
-        。feature-red { border-left: 5px solid #ff5252; }   /* 鲜红色：适合严厉规则、禁令 */
-        。feature-gray { border-left: 5px solid #95a5a6; }  /* 灰色：适合过期信息、次要说明 */
-        。feature-cyan { border-left: 5px solid #00d2d3; }  /* 青色：适合虚空、未来感 */
-        。feature-orange { border-left: 5px solid #e67e22; } /* 活力橙：适合整活、活动、高能公告 */
+        .feature-gold { border-left: 5px solid #ffca28; }  /* 黄金色：适合赞助、等级 */
+        .feature-red { border-left: 5px solid #ff5252; }   /* 鲜红色：适合严厉规则、禁令 */
+        .feature-gray { border-left: 5px solid #95a5a6; }  /* 灰色：适合过期信息、次要说明 */
+        .feature-cyan { border-left: 5px solid #00d2d3; }  /* 青色：适合虚空、未来感 */
+        .feature-orange { border-left: 5px solid #e67e22; } /* 活力橙：适合整活、活动、高能公告 */
         
         /* 交流板块模块化设计 */
-        。contact-container {
+        .contact-container {
             background: var(--card-bg);
             border-radius: 20px;
             overflow: hidden;
@@ -120,9 +120,9 @@
         .contact-note { font-size: 0.8rem; color: var(--secondary-text); margin-bottom: 4px; }
         .contact-value { font-weight: bold; color: var(--accent); letter-spacing: 1px; }
 
-        .copy-btn { font-size: 0.75rem; background: var(--bg); padding: 5px 10px; border-radius: 8px; opacity: 0.6; }
+        。copy-btn { font-size: 0.75rem; background: var(--bg); padding: 5px 10px; border-radius: 8px; opacity: 0.6; }
 
-        .toast {
+        。toast {
             position: fixed;
             bottom: 30px;
             left: 50%;
