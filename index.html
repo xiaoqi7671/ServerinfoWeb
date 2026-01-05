@@ -31,6 +31,8 @@
             color: var(--text);
             font-family: -apple-system, system-ui, sans-serif;
             transition: all 0.3s ease;
+            /* 禁止手机端浏览器默认的点击高亮 */
+            -webkit-tap-highlight-color: transparent;
         }
 
         .container {
@@ -72,21 +74,30 @@
             transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             cursor: pointer;
             border: 1px solid transparent;
-            /* 预设一个左边框位置，防止抖动 */
             border-left: 5px solid transparent; 
+            outline: none;
+            position: relative;
         }
 
+        /* 悬停效果：保持左侧边框颜色同步，增加亮度反馈 */
         .card:hover {
             transform: translateY(-6px);
             box-shadow: 0 10px 25px var(--shadow);
-            border-color: var(--accent);
+            filter: brightness(1.05);
+            border-color: rgba(128, 128, 128, 0.1);
+        }
+
+        /* 点击反馈：微小缩放，替代丑陋的方框 */
+        .card:active {
+            transform: scale(0.98);
+            transition: 0.1s;
         }
 
         .card h3 { margin: 0 0 10px 0; color: var(--accent); font-size: 1.2rem; }
         .card p { margin: 5px 0; font-family: 'Courier New', Courier, monospace; font-weight: bold; }
         .card small { color: var(--secondary-text); font-size: 0.85rem; }
 
-        /* --- 颜色分类修复与补充 --- */
+        /* 特色板块颜色定义 - 强制应用左侧边框颜色 */
         .feature-blue { border-left-color: #0984e3 !important; }
         .feature-green { border-left-color: #00b894 !important; }
         .feature-orange { border-left-color: #e67e22 !important; }
@@ -95,6 +106,7 @@
         .feature-red { border-left-color: #ff5252 !important; }
         .feature-gray { border-left-color: #95a5a6 !important; }
         .feature-cyan { border-left-color: #00d2d3 !important; }
+        .feature-pink { border-left-color: #fd79a8 !important; }
         
         /* 交流板块设计 */
         .contact-container {
@@ -111,19 +123,19 @@
             transition: background 0.2s;
             cursor: pointer;
             align-items: center;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .contact-item:last-child { border-bottom: none; }
-        .contact-item:hover { background: rgba(0,0,0,0.02); }
+        .contact-item:hover { background: rgba(0,0,0,0.03); }
+        .contact-item:active { background: rgba(0,0,0,0.05); }
 
         .contact-info { flex: 1; }
         .contact-note { font-size: 0.8rem; color: var(--secondary-text); margin-bottom: 4px; }
         .contact-value { font-weight: bold; color: var(--accent); letter-spacing: 1px; }
 
-        /* 修复这里的中文句号 */
         .copy-btn { font-size: 0.75rem; background: var(--bg); padding: 5px 10px; border-radius: 8px; opacity: 0.6; }
 
-        /* 修复这里的中文句号 */
         .toast {
             position: fixed;
             bottom: 30px;
@@ -136,6 +148,7 @@
             display: none;
             box-shadow: 0 5px 15px rgba(0,0,0,0.2);
             z-index: 1000;
+            pointer-events: none; /* 防止遮挡点击 */
         }
     </style>
 </head>
@@ -217,13 +230,26 @@
     }
 
     function copy(text) {
+        if (!navigator.clipboard) {
+            // 兼容低版本或非安全环境
+            const el = document.createElement('textarea');
+            el.value = text;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+            showToast();
+            return;
+        }
         navigator.clipboard.writeText(text).then(() => {
-            const t = document.getElementById('toast');
-            t.style.display = 'block';
-            setTimeout(() => t.style.display = 'none', 2000);
-        }).catch(err => {
-            console.error('无法复制', err);
+            showToast();
         });
+    }
+
+    function showToast() {
+        const t = document.getElementById('toast');
+        t.style.display = 'block';
+        setTimeout(() => t.style.display = 'none', 2000);
     }
 
     init();
