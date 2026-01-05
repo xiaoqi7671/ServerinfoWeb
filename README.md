@@ -16,6 +16,7 @@
  * 在该空间内添加一个 Key，名称设为 config。
 2. 配置数据
 在 config 的值中填入以下 JSON 模板并根据实际修改：
+```json
 {
   "serverName": "你的服务器名称",
   "java": {
@@ -42,7 +43,7 @@
     }
   ]
 }
-
+```
 提示：如果不需要显示 Java 或 基岩版，将对应字段设为 null。
 3. 绑定命名空间
  * 将 index.html 上传至 Cloudflare Pages。
@@ -63,6 +64,7 @@ Deployment Guide
  * Add a Key named config.
 2. Configure Data
 Fill the config value with the following JSON template:
+```json
 {
   "serverName": "Your Server Name",
   "java": {
@@ -89,7 +91,7 @@ Fill the config value with the following JSON template:
     }
   ]
 }
-
+```
 Note: Set java or bedrock to null to hide the specific card.
 3. Binding
  * Upload index.html to Cloudflare Pages.
