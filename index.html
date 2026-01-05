@@ -57,13 +57,13 @@
             margin-left: 15px;
         }
 
-        /* 自动适应卡片数量 */
         .card-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 20px;
         }
 
+        /* 基础卡片样式 */
         .card {
             background: var(--card-bg);
             padding: 24px;
@@ -72,6 +72,8 @@
             transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             cursor: pointer;
             border: 1px solid transparent;
+            /* 预设一个左边框位置，防止抖动 */
+            border-left: 5px solid transparent; 
         }
 
         .card:hover {
@@ -84,19 +86,17 @@
         .card p { margin: 5px 0; font-family: 'Courier New', Courier, monospace; font-weight: bold; }
         .card small { color: var(--secondary-text); font-size: 0.85rem; }
 
-        /* 特点板块样式 */
-        .feature-blue { border-left: 5px solid #0984e3; }
-        .feature-green { border-left: 5px solid #00b894; }
-        .feature-orange { border-left: 5px solid #e17055; }
-        .feature-purple { border-left: 5px solid #6c5ce7; }
-        /* 自定义扩展颜色 */
-        .feature-gold { border-left: 5px solid #ffca28; }  /* 黄金色：适合赞助、等级 */
-        .feature-red { border-left: 5px solid #ff5252; }   /* 鲜红色：适合严厉规则、禁令 */
-        .feature-gray { border-left: 5px solid #95a5a6; }  /* 灰色：适合过期信息、次要说明 */
-        .feature-cyan { border-left: 5px solid #00d2d3; }  /* 青色：适合虚空、未来感 */
-        .feature-orange { border-left: 5px solid #e67e22; } /* 活力橙：适合整活、活动、高能公告 */
+        /* --- 颜色分类修复与补充 --- */
+        .feature-blue { border-left-color: #0984e3 !important; }
+        .feature-green { border-left-color: #00b894 !important; }
+        .feature-orange { border-left-color: #e67e22 !important; }
+        .feature-purple { border-left-color: #6c5ce7 !important; }
+        .feature-gold { border-left-color: #ffca28 !important; }
+        .feature-red { border-left-color: #ff5252 !important; }
+        .feature-gray { border-left-color: #95a5a6 !important; }
+        .feature-cyan { border-left-color: #00d2d3 !important; }
         
-        /* 交流板块模块化设计 */
+        /* 交流板块设计 */
         .contact-container {
             background: var(--card-bg);
             border-radius: 20px;
@@ -120,9 +120,11 @@
         .contact-note { font-size: 0.8rem; color: var(--secondary-text); margin-bottom: 4px; }
         .contact-value { font-weight: bold; color: var(--accent); letter-spacing: 1px; }
 
-        。copy-btn { font-size: 0.75rem; background: var(--bg); padding: 5px 10px; border-radius: 8px; opacity: 0.6; }
+        /* 修复这里的中文句号 */
+        .copy-btn { font-size: 0.75rem; background: var(--bg); padding: 5px 10px; border-radius: 8px; opacity: 0.6; }
 
-        。toast {
+        /* 修复这里的中文句号 */
+        .toast {
             position: fixed;
             bottom: 30px;
             left: 50%;
@@ -148,7 +150,7 @@
     <div class="section-title">服务器特色</div>
     <div id="features-grid" class="card-grid"></div>
 
-    <div class="section-title">联系与交流/其他信息</div>
+    <div class="section-title">联系与交流 / 其他信息</div>
     <div class="contact-container" id="contact-list"></div>
 </div>
 
@@ -163,7 +165,6 @@
             document.getElementById('server-name').innerText = data.serverName;
             document.title = data.serverName;
 
-            // 1. 智能渲染连接卡片 (支持单/双显示)
             const connGrid = document.getElementById('connection-cards');
             let hasConn = false;
 
@@ -189,7 +190,6 @@
 
             if(hasConn) document.getElementById('conn-title').style.display = 'flex';
 
-            // 2. 特色介绍
             const featGrid = document.getElementById('features-grid');
             data.features.forEach(f => {
                 featGrid.innerHTML += `
@@ -199,7 +199,6 @@
                     </div>`;
             });
 
-            // 3. 交流模块 (支持多个对象)
             const contactDiv = document.getElementById('contact-list');
             data.contact.forEach(c => {
                 contactDiv.innerHTML += `
@@ -222,6 +221,8 @@
             const t = document.getElementById('toast');
             t.style.display = 'block';
             setTimeout(() => t.style.display = 'none', 2000);
+        }).catch(err => {
+            console.error('无法复制', err);
         });
     }
 
