@@ -11,111 +11,123 @@
             --text: #2d3436;
             --secondary-text: #636e72;
             --accent: #0984e3;
-            --shadow: rgba(0, 0, 0, 0.1);
+            --shadow: rgba(0, 0, 0, 0.08);
         }
 
-        /* 自动切换暗色模式 */
         @media (prefers-color-scheme: dark) {
             :root {
-                --bg: #1e1e1e;
-                --card-bg: #2d2d2d;
-                --text: #dfe6e9;
-                --secondary-text: #b2bec3;
-                --accent: #74b9ff;
+                --bg: #1a1a1b;
+                --card-bg: #2d2d2e;
+                --text: #e0e0e0;
+                --secondary-text: #a0a0a0;
+                --accent: #5ca4ff;
                 --shadow: rgba(0, 0, 0, 0.3);
             }
         }
 
         body {
             margin: 0;
-            padding: 0;
             background-color: var(--bg);
             color: var(--text);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            transition: background 0.3s ease;
+            font-family: -apple-system, system-ui, sans-serif;
+            transition: all 0.3s ease;
         }
 
         .container {
-            max-width: 800px;
+            max-width: 850px;
             margin: 40px auto;
-            padding: 20px;
+            padding: 0 20px;
         }
 
-        h1 { text-align: center; margin-bottom: 40px; }
+        h1 { text-align: center; font-weight: 800; letter-spacing: -1px; }
 
         .section-title {
-            border-left: 4px solid var(--accent);
-            padding-left: 15px;
             margin: 40px 0 20px;
-            font-size: 1.2rem;
+            font-weight: bold;
+            opacity: 0.8;
+            display: flex;
+            align-items: center;
         }
 
-        /* 网格布局 */
+        .section-title::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: var(--shadow);
+            margin-left: 15px;
+        }
+
+        /* 自动适应卡片数量 */
         .card-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 20px;
         }
 
-        /* 动态卡片 */
         .card {
             background: var(--card-bg);
             padding: 24px;
-            border-radius: 16px;
-            box-shadow: 0 4px 12px var(--shadow);
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border-radius: 20px;
+            box-shadow: 0 4px 15px var(--shadow);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             cursor: pointer;
-            position: relative;
-            overflow: hidden;
+            border: 1px solid transparent;
         }
 
         .card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 12px 24px var(--shadow);
+            transform: translateY(-6px);
+            box-shadow: 0 10px 25px var(--shadow);
+            border-color: var(--accent);
         }
 
-        .card h3 { margin-top: 0; color: var(--accent); }
-        .card p { margin: 8px 0; font-family: monospace; font-size: 1.1rem; }
-        .card small { color: var(--secondary-text); }
+        .card h3 { margin: 0 0 10px 0; color: var(--accent); font-size: 1.2rem; }
+        .card p { margin: 5px 0; font-family: 'Courier New', Courier, monospace; font-weight: bold; }
+        .card small { color: var(--secondary-text); font-size: 0.85rem; }
 
-        /* 特点板块专用的颜色边框 */
-        .feature-blue { border-bottom: 4px solid #0984e3; }
-        .feature-green { border-bottom: 4px solid #00b894; }
-        .feature-orange { border-bottom: 4px solid #e17055; }
-        .feature-purple { border-bottom: 4px solid #6c5ce7; }
+        /* 特点板块样式 */
+        .feature-blue { border-left: 5px solid #0984e3; }
+        .feature-green { border-left: 5px solid #00b894; }
+        .feature-orange { border-left: 5px solid #e17055; }
+        .feature-purple { border-left: 5px solid #6c5ce7; }
 
-        /* 交流板块样式 */
-        .contact-section {
+        /* 交流板块模块化设计 */
+        .contact-container {
             background: var(--card-bg);
-            border-radius: 16px;
-            padding: 20px;
-            margin-top: 30px;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px var(--shadow);
         }
 
         .contact-item {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 0;
+            padding: 20px;
             border-bottom: 1px solid var(--shadow);
+            transition: background 0.2s;
+            cursor: pointer;
+            align-items: center;
         }
 
         .contact-item:last-child { border-bottom: none; }
-        .contact-label { font-weight: bold; font-size: 0.9rem; color: var(--secondary-text); }
-        .contact-value { color: var(--accent); font-family: monospace; }
+        .contact-item:hover { background: rgba(0,0,0,0.02); }
 
-        /* 提示动画 */
+        .contact-info { flex: 1; }
+        .contact-note { font-size: 0.8rem; color: var(--secondary-text); margin-bottom: 4px; }
+        .contact-value { font-weight: bold; color: var(--accent); letter-spacing: 1px; }
+
+        .copy-btn { font-size: 0.75rem; background: var(--bg); padding: 5px 10px; border-radius: 8px; opacity: 0.6; }
+
         .toast {
             position: fixed;
-            bottom: 20px;
+            bottom: 30px;
             left: 50%;
             transform: translateX(-50%);
-            background: #333;
+            background: #2d3436;
             color: white;
-            padding: 10px 20px;
-            border-radius: 20px;
+            padding: 12px 25px;
+            border-radius: 50px;
             display: none;
-            z-index: 100;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
         }
     </style>
 </head>
@@ -124,82 +136,90 @@
 <div class="container">
     <h1 id="server-name">Loading...</h1>
 
-    <div class="section-title">连接方式 (点击快速复制)</div>
+    <div id="conn-title" class="section-title" style="display:none;">快速进入</div>
     <div id="connection-cards" class="card-grid"></div>
 
-    <div class="section-title">服务器特点</div>
+    <div class="section-title">服务器特色</div>
     <div id="features-grid" class="card-grid"></div>
 
-    <div class="section-title">交流联系</div>
-    <div class="contact-section" id="contact-list"></div>
+    <div class="section-title">联系与交流</div>
+    <div class="contact-container" id="contact-list"></div>
 </div>
 
-<div id="toast" class="toast">已复制到剪贴板</div>
+<div id="toast" class="toast">内容已复制到剪贴板</div>
 
 <script>
-    async function loadConfig() {
+    async function init() {
         try {
-            const response = await fetch('/api/config');
-            const data = await response.json();
+            const res = await fetch('/api/config');
+            const data = await res.json();
             
-            document.title = data.serverName;
             document.getElementById('server-name').innerText = data.serverName;
+            document.title = data.serverName;
 
-            // 1. 渲染连接卡片
+            // 1. 智能渲染连接卡片 (支持单/双显示)
             const connGrid = document.getElementById('connection-cards');
-            if (data.java) {
+            let hasConn = false;
+
+            if (data.java && data.java.ip) {
+                hasConn = true;
                 connGrid.innerHTML += `
-                    <div class="card" onclick="copy('${data.java.ip}:${data.java.port}')">
+                    <div class="card" onclick="copy('${data.java.ip}${data.java.port ? ':'+data.java.port : ''}')">
                         <h3>Java Edition</h3>
                         <p>${data.java.ip}</p>
-                        <small>端口: ${data.java.port} | 版本: ${data.java.version}</small>
+                        <small>端口: ${data.java.port || '默认'} | 版本: ${data.java.version}</small>
                     </div>`;
             }
-            if (data.bedrock) {
+
+            if (data.bedrock && data.bedrock.ip) {
+                hasConn = true;
                 connGrid.innerHTML += `
                     <div class="card" onclick="copy('${data.bedrock.ip}')">
                         <h3>Bedrock Edition</h3>
                         <p>${data.bedrock.ip}</p>
-                        <small>端口: ${data.bedrock.port} | 版本: ${data.bedrock.version}</small>
+                        <small>端口: ${data.bedrock.port || '19132'} | 版本: ${data.bedrock.version}</small>
                     </div>`;
             }
 
-            // 2. 渲染特点介绍
+            if(hasConn) document.getElementById('conn-title').style.display = 'flex';
+
+            // 2. 特色介绍
             const featGrid = document.getElementById('features-grid');
-            data.features.forEach(item => {
+            data.features.forEach(f => {
                 featGrid.innerHTML += `
-                    <div class="card ${item.styleClass || ''}">
-                        <h3>${item.title}</h3>
-                        <div style="color: var(--secondary-text); line-height: 1.5;">${item.content}</div>
+                    <div class="card ${f.styleClass || ''}">
+                        <h3>${f.title}</h3>
+                        <div style="font-size:0.95rem; line-height:1.6; opacity:0.8;">${f.content}</div>
                     </div>`;
             });
 
-            // 3. 渲染交流板块 (对象数组优化)
+            // 3. 交流模块 (支持多个对象)
             const contactDiv = document.getElementById('contact-list');
-            data.contact.forEach(item => {
+            data.contact.forEach(c => {
                 contactDiv.innerHTML += `
-                    <div class="contact-item" onclick="copy('${item.value}')" style="cursor:pointer">
-                        <div>
-                            <div class="contact-label">${item.note}</div>
-                            <div class="contact-value">${item.value}</div>
+                    <div class="contact-item" onclick="copy('${c.value}')">
+                        <div class="contact-info">
+                            <div class="contact-note">${c.note}</div>
+                            <div class="contact-value">${c.value}</div>
                         </div>
-                        <small style="color:var(--secondary-text)">点击复制</small>
+                        <div class="copy-btn">复制</div>
                     </div>`;
             });
 
-        } catch (err) {
-            console.error("加载配置失败:", err);
+        } catch (e) {
+            console.error("配置加载失败", e);
         }
     }
 
     function copy(text) {
-        navigator.clipboard.writeText(text);
-        const toast = document.getElementById('toast');
-        toast.style.display = 'block';
-        setTimeout(() => toast.style.display = 'none', 2000);
+        navigator.clipboard.writeText(text).then(() => {
+            const t = document.getElementById('toast');
+            t.style.display = 'block';
+            setTimeout(() => t.style.display = 'none', 2000);
+        });
     }
 
-    loadConfig();
+    init();
 </script>
 </body>
 </html>
