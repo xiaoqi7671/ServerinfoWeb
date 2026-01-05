@@ -10,7 +10,7 @@
             --card-bg: #ffffff;
             --text: #2d3436;
             --secondary-text: #636e72;
-            --accent: #0984e3;
+            --accent: #0984e3; /* 你喜欢的那个蓝色 */
             --shadow: rgba(0, 0, 0, 0.08);
         }
 
@@ -31,7 +31,6 @@
             color: var(--text);
             font-family: -apple-system, system-ui, sans-serif;
             transition: all 0.3s ease;
-            /* 禁止手机端浏览器默认的点击高亮 */
             -webkit-tap-highlight-color: transparent;
         }
 
@@ -74,20 +73,20 @@
             transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             cursor: pointer;
             border: 1px solid transparent;
-            border-left: 5px solid transparent; 
+            /* 默认显示你喜欢的蓝色左边框 */
+            border-left: 5px solid var(--accent); 
             outline: none;
             position: relative;
         }
 
-        /* 悬停效果：保持左侧边框颜色同步，增加亮度反馈 */
+        /* 悬停反馈 */
         .card:hover {
             transform: translateY(-6px);
             box-shadow: 0 10px 25px var(--shadow);
-            filter: brightness(1.05);
-            border-color: rgba(128, 128, 128, 0.1);
+            filter: brightness(1.05); /* 微微变亮，颜色依然同步 */
         }
 
-        /* 点击反馈：微小缩放，替代丑陋的方框 */
+        /* 移动端点击缩放 */
         .card:active {
             transform: scale(0.98);
             transition: 0.1s;
@@ -97,7 +96,7 @@
         .card p { margin: 5px 0; font-family: 'Courier New', Courier, monospace; font-weight: bold; }
         .card small { color: var(--secondary-text); font-size: 0.85rem; }
 
-        /* 特色板块颜色定义 - 强制应用左侧边框颜色 */
+        /* 特色板块颜色类：如果 JSON 传入了这些类，会覆盖默认的蓝色 */
         .feature-blue { border-left-color: #0984e3 !important; }
         .feature-green { border-left-color: #00b894 !important; }
         .feature-orange { border-left-color: #e67e22 !important; }
@@ -108,7 +107,7 @@
         .feature-cyan { border-left-color: #00d2d3 !important; }
         .feature-pink { border-left-color: #fd79a8 !important; }
         
-        /* 交流板块设计 */
+        /* 交流板块 */
         .contact-container {
             background: var(--card-bg);
             border-radius: 20px;
@@ -123,7 +122,6 @@
             transition: background 0.2s;
             cursor: pointer;
             align-items: center;
-            -webkit-tap-highlight-color: transparent;
         }
 
         .contact-item:last-child { border-bottom: none; }
@@ -148,7 +146,7 @@
             display: none;
             box-shadow: 0 5px 15px rgba(0,0,0,0.2);
             z-index: 1000;
-            pointer-events: none; /* 防止遮挡点击 */
+            pointer-events: none;
         }
     </style>
 </head>
@@ -231,7 +229,6 @@
 
     function copy(text) {
         if (!navigator.clipboard) {
-            // 兼容低版本或非安全环境
             const el = document.createElement('textarea');
             el.value = text;
             document.body.appendChild(el);
